@@ -1373,7 +1373,7 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, srcGUID, 
 			tempThreatExpire[srcGUID] = GetTime() + 30
 			self:ScheduleTimer("ThreatExpire", 30, srcGUID)
 
-		elseif spellID == 55342 or spellID == 586 then -- Mirror Image, Fade
+		elseif spellID == 55342 or spellID == 586 or spellID == 316254 then -- Mirror Image, Fade and Shadowmeld
 			-- The aura event for this always occurs before the one for SPELL_CAST_SUCCESS
 			--self:Print("|cff40ff40"..srcName.."|r casts "..GetSpellLink(spellID).." on ".."|cff40ff40"..dstName.."|r")
 			mifadeThreat[dstGUID] = newTable()
@@ -1384,6 +1384,8 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, srcGUID, 
 			elseif spellID == 586 then -- Fade
 				tempThreatExpire[dstGUID] = GetTime() + 10
 				self:ScheduleTimer("FadeExpire", 10, dstGUID)
+				mifadeThreat[dstGUID].display = true
+			elseif spellID == 316254 then -- Shadowmeld
 				mifadeThreat[dstGUID].display = true
 			end
 			self:RecordThreat(dstGUID)
@@ -1399,7 +1401,7 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, srcGUID, 
 			--self:Print(GetSpellLink(spellID).." fades from |cffff4040"..srcName.."|r")
 			mdtricksActors[dstGUID] = nil
 			mdtricksActiveActors[dstGUID] = nil
-		elseif spellID == 55342 or spellID == 586 then
+		elseif spellID == 55342 or spellID == 586 or spellID == 316254 then
 			--self:Print(GetSpellLink(spellID).." fades from |cffff4040"..dstName.."|r")
 			self:FadeExpire(dstGUID)
 		end
