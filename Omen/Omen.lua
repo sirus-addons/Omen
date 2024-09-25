@@ -1373,7 +1373,7 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, srcGUID, 
 			tempThreatExpire[srcGUID] = GetTime() + 30
 			self:ScheduleTimer("ThreatExpire", 30, srcGUID)
 
-		elseif spellID == 55342 or spellID == 586 or spellID == 316254 then -- Mirror Image, Fade and Shadowmeld
+		elseif spellID == 55342 or spellID == 586 or spellID == 316254 or spellID == 316255 then -- Mirror Image, Fade, Shadowmeld, Blur
 			-- The aura event for this always occurs before the one for SPELL_CAST_SUCCESS
 			--self:Print("|cff40ff40"..srcName.."|r casts "..GetSpellLink(spellID).." on ".."|cff40ff40"..dstName.."|r")
 			mifadeThreat[dstGUID] = newTable()
@@ -1386,6 +1386,11 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, srcGUID, 
 				self:ScheduleTimer("FadeExpire", 10, dstGUID)
 				mifadeThreat[dstGUID].display = true
 			elseif spellID == 316254 then -- Shadowmeld
+				tempThreatExpire[dstGUID] = nil
+				mifadeThreat[dstGUID].display = true
+			elseif spellID == 316255 then -- Blur
+				tempThreatExpire[dstGUID] = GetTime() + 3
+				self:ScheduleTimer("FadeExpire", 3, dstGUID)
 				mifadeThreat[dstGUID].display = true
 			end
 			self:RecordThreat(dstGUID)
@@ -1401,7 +1406,7 @@ function Omen:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventtype, srcGUID, 
 			--self:Print(GetSpellLink(spellID).." fades from |cffff4040"..srcName.."|r")
 			mdtricksActors[dstGUID] = nil
 			mdtricksActiveActors[dstGUID] = nil
-		elseif spellID == 55342 or spellID == 586 or spellID == 316254 then
+		elseif spellID == 55342 or spellID == 586 or spellID == 316254 or spellID == 316255 then
 			--self:Print(GetSpellLink(spellID).." fades from |cffff4040"..dstName.."|r")
 			self:FadeExpire(dstGUID)
 		end
@@ -1561,7 +1566,11 @@ function Omen:UpdateCountDowns()
 		if guid then
 			-- Update the text on the bar
 			if mifadeThreat[guid] and mifadeThreat[guid].display then
-				bar.Text1:SetFormattedText("%s [%.0f]", guidNameLookup[guid], tempThreatExpire[guid] - GetTime())
+				if tempThreatExpire[guid] then
+					bar.Text1:SetFormattedText("%s [%.0f]", guidNameLookup[guid], tempThreatExpire[guid] - GetTime())
+				else
+					bar.Text1:SetText(guidNameLookup[guid])
+				end
 				if not timers.UpdateCountDowns then
 					timers.UpdateCountDowns = self:ScheduleTimer("UpdateCountDowns", 0.25)
 				end
@@ -1883,7 +1892,11 @@ function Omen:UpdateBarsReal()
 
 			-- Update the text on the bar
 			if mifadeThreat[guid] and mifadeThreat[guid].display then
-				bar.Text1:SetFormattedText("%s [%.0f]", guidNameLookup[guid], tempThreatExpire[guid] - GetTime())
+				if tempThreatExpire[guid] then
+					bar.Text1:SetFormattedText("%s [%.0f]", guidNameLookup[guid], tempThreatExpire[guid] - GetTime())
+				else
+					bar.Text1:SetText(guidNameLookup[guid])
+				end
 				if not timers.UpdateCountDowns then
 					timers.UpdateCountDowns = self:ScheduleTimer("UpdateCountDowns", 0.25)
 				end
