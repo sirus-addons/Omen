@@ -591,7 +591,6 @@ function Omen:OnEnable()
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED")
 	self:RegisterEvent("UNIT_PET", "PARTY_MEMBERS_CHANGED")
 	self:RegisterEvent("UNIT_NAME_UPDATE", "PARTY_MEMBERS_CHANGED")
-	self:RegisterEvent("PLAYER_PET_CHANGED", "PARTY_MEMBERS_CHANGED")
 	--self:RegisterEvent("RAID_ROSTER_UPDATE", "PARTY_MEMBERS_CHANGED") -- Is this needed?
 
 	self:RegisterEvent("PLAYER_UPDATE_RESTING", "UpdateVisible")
@@ -624,6 +623,7 @@ end
 
 function Omen:OnProfileChanged(event, database, newProfileKey)
 	db = database.profile
+	self:SetSinkStorage(db.Warnings.SinkOptions)
 	self:SetAnchors(true)
 	self.Anchor:SetAlpha(db.Alpha)
 	self.Anchor:SetFrameStrata(strsub(db.FrameStrata, 3))
@@ -1993,7 +1993,7 @@ function Omen:UpdateBarsReal()
 		threatTable = delTable(threatTable)
 	elseif myGUID then
 		local myClass = guidClassLookup[myGUID]
-		local myThreatPercent = threatTable[myGUID] / tankThreat * 100
+		local myThreatPercent = tankThreat == 0 and 0 or threatTable[myGUID] / tankThreat * 100
 		local t = db.Warnings
 		if lastWarn.mobGUID == mobGUID and myThreatPercent >= t.Threshold and t.Threshold > lastWarn.threatpercent then
 			if not t.DisableWhileTanking or not (myClass == "WARRIOR" and GetBonusBarOffset() == 2 or
